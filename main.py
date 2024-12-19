@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 class Result(BaseModel):
     name: str
     surname: str
-    date_of_birth: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}$")  # YYYY-MM-DD format
+    date_of_birth: str
     address: str
     identification_number: str
 
