@@ -15,7 +15,7 @@ Currently data was downloaded locally and processed. In prodcution, data should 
 
 ## Fireworks API
 
-Fireworks AI api support one of the best lightweight vision model phi-3-vision-128k-instruct which has 128k context length.
+Fireworks AI API supports one of the best lightweight vision model phi-3-vision-128k-instruct which has 128k context length. I chose this model as the identification system might be designed to run on edge devices with limited resources.
 
 ## Jailbreak
 
