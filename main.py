@@ -2,7 +2,8 @@ import openai
 import base64
 import sys
 import os
-from pydantic import BaseModel, Field
+from typing import Literal
+from pydantic import BaseModel, Field, validator
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -11,6 +12,32 @@ load_dotenv()
 # Configuration
 FIREWORKS_BASE_URL = "https://api.fireworks.ai/inference/v1"
 FIREWORKS_MODEL = "accounts/fireworks/models/phi-3-vision-128k-instruct"
+SUPPORTED_IMAGE_FORMATS = {
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".bmp",
+    ".tiff",
+    ".ppm",
+}  # from Fireworks AI doc at https://docs.fireworks.ai/guides/querying-vision-language-models
+
+
+class ImageInput(BaseModel):
+    file_path: str
+
+    @validator("file_path")
+    def validate_image_file(cls, file_path: str) -> str:
+        if not os.path.exists(file_path):
+            raise ValueError(f"Image file '{file_path}' not found")
+
+        file_ext = os.path.splitext(file_path)[1].lower()
+        if file_ext not in SUPPORTED_IMAGE_FORMATS:
+            raise ValueError(
+                f"Unsupported image format '{file_ext}'. Supported formats: {', '.join(SUPPORTED_IMAGE_FORMATS)}"
+            )
+
+        return file_path
 
 
 class Result(BaseModel):
@@ -21,33 +48,29 @@ class Result(BaseModel):
     identification_number: str
 
 
-def encode_image(image_path):
+def encode_image(image_path: str) -> str:
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode("utf-8")
 
 
-def main():
+def main() -> None:
     # Check if image path is provided as command line argument
     if len(sys.argv) != 2:
         print("Usage: python main.py <path_to_image>")
         sys.exit(1)
 
-    image_path = sys.argv[1]
-
-    # Validate if file exists
-    if not os.path.exists(image_path):
-        print(f"Error: Image file '{image_path}' not found")
-        sys.exit(1)
-
-    # The base64 string of the image
-    image_base64 = encode_image(image_path)
-
-    client = openai.OpenAI(
-        base_url=FIREWORKS_BASE_URL,
-        api_key=os.getenv("FIREWORKS_API_KEY"),
-    )
-
     try:
+        # Validate image input
+        image_input = ImageInput(file_path=sys.argv[1])
+
+        # The base64 string of the image
+        image_base64 = encode_image(image_input.file_path)
+
+        client = openai.OpenAI(
+            base_url=FIREWORKS_BASE_URL,
+            api_key=os.getenv("FIREWORKS_API_KEY"),
+        )
+
         response = client.chat.completions.create(
             model=FIREWORKS_MODEL,
             response_format={
@@ -90,6 +113,9 @@ def main():
         )
         print(repr(response.choices[0].message.content))
 
+    except ValueError as e:
+        print(f"Validation error: {str(e)}")
+        sys.exit(1)
     except Exception as e:
         print(f"Error processing image: {str(e)}")
         sys.exit(1)
