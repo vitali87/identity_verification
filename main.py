@@ -3,6 +3,10 @@ import base64
 import sys
 import os
 from pydantic import BaseModel, Field
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 class Result(BaseModel):
@@ -35,13 +39,13 @@ def main():
     image_base64 = encode_image(image_path)
 
     client = openai.OpenAI(
-        base_url="https://api.fireworks.ai/inference/v1",
-        api_key="fw_3ZP64DDAUxJct6p5eouQXW5X",
+        base_url=os.getenv("FIREWORKS_BASE_URL"),
+        api_key=os.getenv("FIREWORKS_API_KEY"),
     )
 
     try:
         response = client.chat.completions.create(
-            model="accounts/fireworks/models/phi-3-vision-128k-instruct",
+            model=os.getenv("FIREWORKS_MODEL"),
             response_format={
                 "type": "json_object",
                 "schema": Result.model_json_schema(),

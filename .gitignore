@@ -8,3 +8,4 @@
 *.webp
 
 .venv
+.env
