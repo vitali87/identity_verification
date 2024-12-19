@@ -7,6 +7,7 @@
 - Use OpenAI API for LLM
 - JSON format for the response
 - Productionize the API with FastAPI, Kubernetes
+- Output design choices and tradeoffs
 
 ## Data storage in cloud bucket
 
@@ -18,7 +19,7 @@ Fireworks AI api support one of the best lightweight vision model phi-3-vision-1
 
 ## Jailbreak
 
-The model refused to extract person identity information from the image. So I had to jailbreak the model to extract the data. I understand this is probably meant for understanding if Fireworks AI vision models are susceptible to jailbreak. 
+The model refused to extract person identity information from the image. So I had to jailbreak the model to extract the data although I am not sure if this is the best approach. And I am not advocating for jailbreak as it is not a good practice. But I understand the reason for assigning this task might be to understand if the model is susceptible to jailbreak.
 
 ## Pydantic
 
@@ -35,6 +36,17 @@ JSON format is used to format the response as the production system might expect
 ## FastAPI
 
 As I have done numerous times before, k8s with FastAPI api endpoint deployed on it can be used to productionize the system. However, due to limited time, I have not impelemented this part.
+
+## Output design choices and tradeoffs
+
+The output is a JSON format with the following fields:
+
+- `person_name`: The name of the person in the image.
+- `person_age`: The age of the person in the image.
+- `person_gender`: The gender of the person in the image.
+- `person_identity`: The identity of the person in the image.
+
+I understand the output may not be complete as the FSI enterprise system may have more fields to extract. Tradeoffs are made to keep the output simple and easy to process.
 
 # How to run
 
