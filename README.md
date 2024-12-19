@@ -42,9 +42,10 @@ As I have done numerous times before, k8s with FastAPI api endpoint deployed on 
 The output is a JSON format with the following fields:
 
 - `person_name`: The name of the person in the image.
-- `person_age`: The age of the person in the image.
-- `person_gender`: The gender of the person in the image.
-- `person_identity`: The identity of the person in the image.
+- `person_surname`: The surname of the person in the image.
+- `person_date_of_birth`: The date of birth of the person in the image.
+- `person_address`: The address of the person in the image.
+- `person_identification_number`: The identification number of the person in the image.
 
 I understand the output may not be complete as the FSI enterprise system may have more fields to extract. Tradeoffs are made to keep the output simple and easy to process.
 
