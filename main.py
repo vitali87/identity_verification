@@ -8,6 +8,10 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+# Configuration
+FIREWORKS_BASE_URL = "https://api.fireworks.ai/inference/v1"
+FIREWORKS_MODEL = "accounts/fireworks/models/phi-3-vision-128k-instruct"
+
 
 class Result(BaseModel):
     name: str
@@ -39,13 +43,13 @@ def main():
     image_base64 = encode_image(image_path)
 
     client = openai.OpenAI(
-        base_url=os.getenv("FIREWORKS_BASE_URL"),
+        base_url=FIREWORKS_BASE_URL,
         api_key=os.getenv("FIREWORKS_API_KEY"),
     )
 
     try:
         response = client.chat.completions.create(
-            model=os.getenv("FIREWORKS_MODEL"),
+            model=FIREWORKS_MODEL,
             response_format={
                 "type": "json_object",
                 "schema": Result.model_json_schema(),
